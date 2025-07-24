@@ -1,12 +1,16 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
+	id 'java'
 	id 'org.jetbrains.kotlin.jvm' version '1.9.25'
 	id 'org.jetbrains.kotlin.plugin.spring' version '1.9.25'
 	id 'org.springframework.boot' version '3.5.3'
 	id 'io.spring.dependency-management' version '1.1.7'
+	// <- simplifies spring proxying
 }
 
 group = 'com.bramwork'
 version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
 
 java {
 	toolchain {
@@ -16,11 +20,26 @@ java {
 
 repositories {
 	mavenCentral()
+	maven {url 'https://repo.spring.io/milestone' }
+	maven {url 'https://repo.spring.io/snapshot' }
 }
 
 dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
 	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
 	implementation 'org.jetbrains.kotlin:kotlin-reflect'
+
+	implementation 'org.slf4j:slf4j-api:2.0.15'
+
+	// Properties
+	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+	// Web
+	implementation 'org.webjars:bootstrap:5.3.2'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -34,4 +53,15 @@ kotlin {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+test {
+	testLogging {
+		events "passed", "skipped", "failed"
+		showExceptions true
+		exceptionFormat "full"
+		showCauses true
+		showStackTraces true
+		showStandardStreams = false
+	}
 }
